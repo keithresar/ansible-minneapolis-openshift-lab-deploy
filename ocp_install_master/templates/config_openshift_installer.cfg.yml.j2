@@ -1,0 +1,44 @@
+ansible_inventory_path: /root/.config/openshift/hosts
+ansible_log_path: /tmp/ansible.log
+deployment:
+  ansible_ssh_user: root
+  hosts:
+  - connect_to: {{ inventory_hostname }}
+    hostname: {{ inventory_hostname }}
+    ip: {{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}
+    openshift_hosted_registry_storage_kind: nfs
+    public_hostname: {{ inventory_hostname }}
+    public_ip: {{ hostvars[inventory_hostname]['ansible_eth0']['ipv4']['address'] }}
+    roles:
+    - master
+    - etcd
+    - node
+    - storage
+
+{% for host in hostvars %}
+{% if host | match("ocp-" + deploy_id + "-node-\d+.example.com") %}
+  - connect_to: {{ host }}
+    hostname: {{ host }}
+    ip: {{ hostvars[host]['ansible_eth0']['ipv4']['address'] }}
+    node_labels: '{''region'': ''infra''}'
+    public_hostname: {{ host }}
+    public_ip: {{ hostvars[host]['ansible_eth0']['ipv4']['address'] }}
+    roles:
+    - node
+{% endif %}
+{% endfor %}
+
+  master_routingconfig_subdomain: ocp-{{ deploy_id }}.example.com
+  openshift_master_cluster_hostname: None
+  openshift_master_cluster_public_hostname: None
+  proxy_exclude_hosts: ''
+  proxy_http: ''
+  proxy_https: ''
+  roles:
+    etcd: {}
+    master: {}
+    node: {}
+    storage: {}
+variant: openshift-enterprise
+variant_version: '3.7'
+version: v2

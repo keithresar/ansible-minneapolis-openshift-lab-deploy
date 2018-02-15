@@ -1,0 +1,35 @@
+---
+
+- name: Copy root key
+  copy:
+    src: files/id_rsa
+    dest: /root/.ssh/id_rsa
+    mode: 0600
+
+- name: Create DNS entry
+  nsupdate:
+    key_name: "rndc-key"
+    key_secret: "secret=="
+    server: "{{ local_dns_server }}"
+    zone: "lab.422long.com"
+    record: "*.ocp-{{ deploy_id }}"
+    value: "{{ ansible_ssh_host }}"
+  delegate_to: localhost
+
+- name: Add ssh host keys to trust
+  block:
+    - file:
+        dest: /tmp/ssh_host_keys
+        state: absent
+    - shell: "ssh-keyscan {{ item }} >> /tmp/ssh_host_keys"
+      when: "{{ item | match('ocp-' + deploy_id + '-.+.example.com') }}"
+      with_items: "{{ hostvars }}"
+    - copy:
+        remote_src: yes
+        src: /tmp/ssh_host_keys
+        dest: /root/.ssh/known_hosts
+        mode: 0644
+    - file:
+        dest: /tmp/ssh_host_keys
+        state: absent
+

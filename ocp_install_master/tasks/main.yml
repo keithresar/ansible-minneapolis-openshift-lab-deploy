@@ -1,0 +1,6 @@
+---
+
+- include_tasks: ready_master.yml
+- include_tasks: install.yml
+- include_tasks: authentication.yml
+

@@ -1,0 +1,35 @@
+[OSEv3:children]
+nodes
+masters
+nfs
+etcd
+
+[OSEv3:vars]
+openshift_master_cluster_public_hostname=None
+openshift_master_default_subdomain=ocp-{{ deploy_id }}.example.com
+ansible_ssh_user=root
+openshift_master_cluster_hostname=None
+openshift_override_hostname_check=true
+openshift_metrics_install_metrics=true
+openshift_metrics_hawkular_hostname=metrics.ocp-{{ deploy_id }}.example.com
+deployment_type=openshift-enterprise
+
+[masters]
+{{ inventory_hostname }}  openshift_hosted_registry_storage_kind=nfs ansible_connection=local
+
+[nfs]
+{{ inventory_hostname }}  openshift_hosted_registry_storage_kind=nfs ansible_connection=local
+
+[etcd]
+{{ inventory_hostname }}  openshift_hosted_registry_storage_kind=nfs ansible_connection=local
+
+[nodes]
+{{ inventory_hostname }}  openshift_hosted_registry_storage_kind=nfs openshift_schedulable=True ansible_connection=local
+
+{% for host in hostvars %}
+{% if host | match("ocp-" + deploy_id + "-node-\d+.example.com") %}
+{{ host }}  openshift_node_labels="{'region': 'infra'}" openshift_schedulable=True
+{% endif %}
+{% endfor %}
+
+
