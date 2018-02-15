@@ -2,10 +2,16 @@
 
 - name: Set cluster position
   set_fact:
+    # If we deploy a dozen clusters, what cluster number are you?
     pos_index: "{{ groups['tag_Name_ocp_lab_master'].index(inventory_hostname) | int }}"
 
 - name: Set cluster domain
   set_fact:
+    # Map cluster number to an alphabetical position and use to build
+    # the unique domain for this cluster
+    # e.g. pos_index=0 --> lab-a.openshiftdelivers.com
+    #      pos_index=1 --> lab-b.openshiftdelivers.com
+    # fyi, alpha_lst = [a, b, c, ... ]
     cluster_full_domain: "lab-{{ alpha_lst[pos_index|int] }}.openshiftdelivers.com"
     cluster_leading_domain: "lab-{{ alpha_lst[pos_index|int] }}"
     

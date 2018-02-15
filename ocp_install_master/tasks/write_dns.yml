@@ -10,6 +10,9 @@
     state: present
   delegate_to: localhost
   with_items:
+    # master.lab-a.openshiftdelivers.com
+    # node.lab-a.openshiftdelivers.com
+    # *.routes.lab-a.openshiftdelivers.com
     - "{{ cluster_master }}"
     - "{{ cluster_node }}"
     - hostname: "*.routes.{{ cluster_leading_domain }}"

@@ -10,6 +10,9 @@
       when: deploy_id is not defined
 
 
+
+
+
 - hosts: localhost
   
   tasks:
@@ -39,6 +42,9 @@
             name: root
           - size: 20GiB
             name: docker
+
+
+
 
 
 - hosts: "ocp-{{ deploy_id }}-*.example.com"
