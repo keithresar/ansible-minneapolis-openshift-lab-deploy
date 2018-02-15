@@ -1,0 +1,16 @@
+---
+- name: Install OCP pre-reqs
+  yum:
+    name:
+      - wget
+      - git
+      - net-tools
+      - bind-utils
+      - iptables-services
+      - bridge-utils
+      - bash-completion
+      - screen
+      - atomic-openshift-utils
+      - docker
+    state: present
+

@@ -1,0 +1,39 @@
+---
+- name: Enable access to integrated registry
+  lineinfile:
+    path: /etc/sysconfig/docker
+    regexp: "^OPTIONS="
+    line: 'OPTIONS="--selinux-enabled --log-driver=journald --insecure-registry 172.30.0.0/16"'
+
+- name: Set docker-storage-setup params
+  copy:
+    dest: /etc/sysconfig/docker-storage-setup
+    content: |
+      VG=docker-vg
+      DEVS=/dev/sdb
+      DATA_SIZE=19GB
+      WIPE_SIGNATURES=true
+
+- name: Verify docker storage status
+  command: lvdisplay docker-vg/docker-pool
+  ignore_errors: yes
+  register: docker_storage_status
+
+- name: Shutdown docker if running
+  systemd:
+    name: docker
+    state: stopped
+  when: docker_storage_status.rc
+
+- name: Enable docker-storage
+  command: docker-storage-setup
+  when: docker_storage_status.rc
+
+- name: Start and enable docker
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+
+
+

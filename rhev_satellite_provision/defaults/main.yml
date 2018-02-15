@@ -1,7 +1,7 @@
 ---
 # defaults file for hammer_provision
 activation_key: rhel74
-subdomain: lab.422long.com
+subdomain: example.com
 instance_count: 1
 instance_disks: False
 instance_cpu: 1
