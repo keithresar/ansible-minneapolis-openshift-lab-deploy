@@ -6,16 +6,6 @@
     dest: /root/.ssh/id_rsa
     mode: 0600
 
-- name: Create DNS entry
-  nsupdate:
-    key_name: "rndc-key"
-    key_secret: "secret=="
-    server: "{{ local_dns_server }}"
-    zone: "lab.422long.com"
-    record: "*.ocp-{{ deploy_id }}"
-    value: "{{ ansible_ssh_host }}"
-  delegate_to: localhost
-
 - name: Add ssh host keys to trust
   block:
     - file:
