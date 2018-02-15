@@ -1,0 +1,58 @@
+---
+
+- name: Pre-flight checks
+  hosts: localhost
+  gather_facts: no
+
+  tasks:
+    - fail: 
+        msg: "Missing required parameter 'deploy_id'" 
+      when: deploy_id is not defined
+
+
+- hosts: localhost
+  
+  tasks:
+    - include_role:
+        name: rhev_satellite_provision
+      vars:
+        instance_name: "ocp-{{ deploy_id }}-master"
+        instance_count: 1
+        instance_cpu: 2
+        instance_ram_gb: 16
+        instance_ram_gb_guaranteed: 4
+        instance_disks:
+          - size: 40GiB
+            name: root
+          - size: 20GiB
+            name: docker
+
+    - include_role:
+        name: rhev_satellite_provision
+      vars:
+        instance_name: "ocp-{{ deploy_id }}-node-"
+        instance_count: 1
+        instance_cpu: 1
+        instance_ram_gb: 8
+        instance_disks:
+          - size: 20GiB
+            name: root
+          - size: 20GiB
+            name: docker
+
+
+- hosts: "ocp-{{ deploy_id }}-*.lab.422long.com"
+  tags: prep
+  
+  roles:
+    - host_prep
+    - ocp_prep_common
+
+
+- hosts: "ocp-{{ deploy_id }}-master1.lab.422long.com"
+  tags: install
+  
+  roles:
+    - ocp_install_master
+
+
