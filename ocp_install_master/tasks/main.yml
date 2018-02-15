@@ -1,6 +1,6 @@
 ---
 
-#- include_tasks: set_cluster_hostnames.yml # for AWS provisioning
+#- include_tasks: set_aws_cluster_hostnames.yml # for AWS provisioning
 - include_tasks: write_dns.yml
 - include_tasks: ready_master.yml
 - include_tasks: install.yml
