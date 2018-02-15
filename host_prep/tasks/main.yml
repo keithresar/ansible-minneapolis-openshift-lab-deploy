@@ -1,0 +1,7 @@
+---
+- name: Patch to latest
+  yum:
+    name: "*"
+    state: latest
+  when: yum_update
+

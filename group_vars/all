@@ -1,0 +1,18 @@
+---
+satellite_hostname: satellite.example.com
+satellite_user: myuser
+satellite_password: mypassword
+
+satellite_organization_id: 1
+satellite_location_id: 2
+satellite_hostgroup_id: 2
+satellite_compute_resource_id: 1
+
+rhev_hostname: rhev1.example.com
+rhev_username: admin@internal
+rhev_password: mypassword
+rhev_cluster: lab
+rhev_storage_domain: ssd_vg2_lv1
+
+local_dns_server: 192.168.0.100
+
