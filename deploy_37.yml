@@ -31,7 +31,7 @@
         name: rhev_satellite_provision
       vars:
         instance_name: "ocp-{{ deploy_id }}-node-"
-        instance_count: 1
+        instance_count: 2
         instance_cpu: 1
         instance_ram_gb: 8
         instance_disks:
@@ -41,7 +41,7 @@
             name: docker
 
 
-- hosts: "ocp-{{ deploy_id }}-*.lab.422long.com"
+- hosts: "ocp-{{ deploy_id }}-*.example.com"
   tags: prep
   
   roles:
@@ -49,7 +49,7 @@
     - ocp_prep_common
 
 
-- hosts: "ocp-{{ deploy_id }}-master1.lab.422long.com"
+- hosts: "ocp-{{ deploy_id }}-master1.example.com"
   tags: install
   
   roles:

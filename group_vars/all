@@ -14,5 +14,6 @@ rhev_password: mypassword
 rhev_cluster: lab
 rhev_storage_domain: ssd_vg2_lv1
 
-local_dns_server: 192.168.0.100
+namecom_username: myuser
+namecom_api_token: mykey
 

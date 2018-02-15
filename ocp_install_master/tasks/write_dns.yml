@@ -1,0 +1,17 @@
+---
+
+- name: Create dns records
+  namecom_dns:
+    username: "{{ namecom_username }}"
+    api_token: "{{ namecom_api_token }}"
+    domain: example.com
+    hostname: "{{ item.hostname }}"
+    content: "{{ item.public_ip }}"
+    state: present
+  delegate_to: localhost
+  with_items:
+    - "{{ cluster_master }}"
+    - "{{ cluster_node }}"
+    - hostname: "*.routes.{{ cluster_leading_domain }}"
+      public_ip: "{{ cluster_master.public_ip }}"
+

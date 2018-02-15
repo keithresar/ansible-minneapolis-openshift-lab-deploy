@@ -1,0 +1,29 @@
+---
+
+- name: Set cluster position
+  set_fact:
+    pos_index: "{{ groups['tag_Name_ocp_lab_master'].index(inventory_hostname) | int }}"
+
+- name: Set cluster domain
+  set_fact:
+    cluster_full_domain: "lab-{{ alpha_lst[pos_index|int] }}.openshiftdelivers.com"
+    cluster_leading_domain: "lab-{{ alpha_lst[pos_index|int] }}"
+    
+- name: Set cluster node facts
+  set_fact:
+    cluster_master:
+      hostname: "master.{{ cluster_leading_domain }}"
+      fqdn: "master.{{ cluster_full_domain }}"
+      public_ip: "{{ groups['tag_Name_ocp_lab_master'][pos_index|int] }}"
+      private_ip: "{{ hostvars[groups['tag_Name_ocp_lab_master'][pos_index|int]]['ec2_private_ip_address'] }}"
+    cluster_node: 
+      hostname: "node.{{ cluster_leading_domain }}"
+      fqdn: "node.{{ cluster_full_domain }}"
+      public_ip: "{{ groups['tag_Name_ocp_lab_node'][pos_index|int] }}"
+      private_ip: "{{ hostvars[groups['tag_Name_ocp_lab_node'][pos_index|int]]['ec2_private_ip_address'] }}"
+
+- debug:
+    msg:
+      - "{{ cluster_master }}"
+      - "{{ cluster_node }}"
+
