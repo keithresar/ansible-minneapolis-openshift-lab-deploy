@@ -1,0 +1,33 @@
+---
+- set_fact:
+    wait_for_ips: "[]"
+
+- name: Provision Satellite definition
+  uri:
+    url: "https://{{ satellite_hostname }}/api/v2/hosts/"
+    method: POST 
+    user: "{{ satellite_user }}"
+    password: "{{ satellite_password }}"
+    force_basic_auth: yes 
+    validate_certs: no
+
+    status_code: 201
+    body_format: json
+    body:
+      host:
+        name: "{{ item }}"
+        location_id: "{{ satellite_location_id }}"
+        organization_id: "{{ satellite_organization_id }}"
+        hostgroup_id: "{{ satellite_hostgroup_id }}"
+        compute_resource_id: "{{ satellite_compute_resource_id }}"
+        build: true
+        enabled: false
+        compute-attributes:
+          build: true
+  register: provision_resp
+  with_items: "{{ to_build }}"
+
+- set_fact:
+    wait_for_ips: "{{ wait_for_ips }} + [ '{{ item.json.ip }}' ]"
+  with_items: "{{ provision_resp.results }}"
+

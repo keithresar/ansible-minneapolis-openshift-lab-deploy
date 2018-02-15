@@ -1,0 +1,71 @@
+---
+- name: RHEV Auth
+  ovirt_auth:
+    url: "https://{{ rhev_hostname }}/ovirt-engine/api"
+    username: "{{ rhev_username }}"
+    password: "{{ rhev_password }}"
+    insecure: yes
+
+- name: Verify VM stopped in RHEV
+  ovirt_vms:
+    auth: "{{ ovirt_auth }}"
+    name: "{{ item | regex_replace('\\.','-') }}"
+    cluster: "{{ rhev_cluster }}"
+    state: stopped
+  with_items: "{{ to_build }}"
+
+- name: Remove default disks
+  ovirt_disks:
+    auth: "{{ ovirt_auth }}"
+    vm_name: "{{ item | regex_replace('\\.','-') }}"
+    name: "{{ item | regex_replace('\\.','-') }}_Disk1"
+    state: absent
+  register: rhev_resp
+  until: rhev_resp|succeeded or rhev_resp.msg.find("HTTP response code is 409") == -1
+  retries: 10
+  delay: 10
+  with_items: "{{ to_build }}"
+  when: instance_disks
+
+- name: Add custom disks
+  ovirt_disks:
+    auth: "{{ ovirt_auth }}"
+    vm_name: "{{ item[0] | regex_replace('\\.','-') }}"
+    name: "{{ item[0] | regex_replace('\\.','-') }}_{{ item[1].name}}"
+    size: "{{ item[1].size }}"
+    interface: virtio_scsi
+    storage_domain: "{{ rhev_storage_domain }}"
+  with_nested:
+    - "{{ to_build }}"
+    - "{{ instance_disks }}"
+  until: rhev_resp|succeeded or rhev_resp.msg.find("HTTP response code is 409") == -1
+  retries: 10
+  when: instance_disks
+
+- name: Make first disk bootable
+  ovirt_disks:
+    auth: "{{ ovirt_auth }}"
+    vm_name: "{{ item | regex_replace('\\.','-') }}"
+    name: "{{ item | regex_replace('\\.','-') }}_{{ instance_disks[0].name}}"
+    bootable: yes
+  with_items: "{{ to_build }}"
+  until: rhev_resp|succeeded or rhev_resp.msg.find("HTTP response code is 409") == -1
+  retries: 10
+  when: instance_disks
+
+- name: Configure VM settings in RHEV
+  ovirt_vms:
+    auth: "{{ ovirt_auth }}"
+    cluster: "{{ rhev_cluster }}"
+    name: "{{ item | regex_replace('\\.','-') }}"
+    state: running
+    cpu_cores: "{{ instance_cpu }}"
+    memory: "{{ instance_ram_gb }}GiB"
+    memory_guaranteed: "{{ instance_ram_gb_guaranteed }}GiB"
+  register: rhev_resp
+  until: rhev_resp|succeeded or rhev_resp.msg.find("HTTP response code is 409") == -1
+  retries: 10
+  delay: 10
+  with_items: "{{ to_build }}"
+
+

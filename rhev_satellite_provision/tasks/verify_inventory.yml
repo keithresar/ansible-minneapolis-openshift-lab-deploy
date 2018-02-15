@@ -1,0 +1,16 @@
+---
+
+- set_fact:
+    to_build: "[]"
+
+- name: "Create expected hostnames for {{ instance_name }}"
+  set_fact:
+    to_build: "{{ to_build }} + [ '{{ instance_name }}{{ item }}.{{ subdomain }}' ]" 
+  with_sequence: start=1 end={{ instance_count }}
+
+- name: "Prune hosts that exist for {{ instance_name }}"
+  set_fact:
+    to_build: "{{ to_build | difference([ item ]) }}"
+  with_items: "{{ to_build }}"
+  when: "item in hostvars"
+

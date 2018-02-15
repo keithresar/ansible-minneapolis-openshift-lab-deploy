@@ -1,0 +1,9 @@
+---
+- name: Wait for builds to complete
+  wait_for:
+    port: 22
+    host: "{{ item }}"
+    search_regex: OpenSSH
+    timeout: 3600
+  with_items: "{{ wait_for_ips }}"
+

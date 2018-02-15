@@ -1,0 +1,12 @@
+---
+
+- import_tasks: verify_inventory.yml
+
+- block:
+    - import_tasks: satellite_provision.yml
+    - import_tasks: rhev_configure.yml
+    - import_tasks: satellite_wait_for_build.yml
+    - meta: refresh_inventory
+  when: to_build
+
+

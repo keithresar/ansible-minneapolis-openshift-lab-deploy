@@ -1,0 +1,9 @@
+---
+# defaults file for hammer_provision
+activation_key: rhel74
+subdomain: lab.422long.com
+instance_count: 1
+instance_disks: False
+instance_cpu: 1
+instance_ram_gb: 2
+instance_ram_gb_guaranteed: 1
